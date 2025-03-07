@@ -1,15 +1,12 @@
 import datetime
-import os
 
-from dotenv import load_dotenv
+from src.utils import card_stats, exchange_rate_usd_eur, greeting_now, reader_excel, sort_operations_by_amount, stock_prices
 
-from src.utils import (card_stats, exchange_rate_usd_eur, greeting_now,
-                       reader_excel, sort_operations_by_amount, stock_prices)
-
-load_dotenv()
-API_KEY = os.getenv("API_KEY")
 
 now = str(datetime.datetime.now())
+
+start_time = str(datetime.datetime.now().date())[:8] + '01'
+end_time = str(datetime.datetime.now().date())
 
 
 def main_page(path:str):
@@ -36,7 +33,7 @@ def main_page(path:str):
     return json_string
 
 
-def events_page(date:str, diaposone:str = ):
+def events_page(date:str, diaposone:str = f'{start_time}-{end_time}'):
     json_string = {"expenses": {
             "total_amount": 0,
             "main": [],
@@ -49,5 +46,6 @@ def events_page(date:str, diaposone:str = ):
           "currency_rates": [],
           "stock_prices": []
         }
+
     json_string["currency_rates"] = exchange_rate_usd_eur()
     json_string["stock_prices"] = stock_prices()

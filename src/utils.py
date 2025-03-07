@@ -1,12 +1,14 @@
 import datetime
+import os
 from collections import Counter
+from dotenv import load_dotenv
 
 import pandas as pd
 import requests
 import yfinance as yf
 
-from src.views import API_KEY
-
+load_dotenv()
+API_KEY = os.getenv("API_KEY")
 
 def reader_excel(path: str):
     """Функция считывает финансовые операции excel файлов"""
@@ -32,7 +34,8 @@ def sort_operations_by_amount(list_operations:list) ->list:
     top_tranzitions = [{"date": '', "amount": 0, "category": '', "description": ''},{"date": '', "amount": 0, "category": '', "description": ''},{"date": '', "amount": 0, "category": '', "description": ''},{"date": '', "amount": 0, "category": '', "description": ''},{"date": '', "amount": 0, "category": '', "description": ''}]
     for operation in list_operations:
         if operation['Сумма платежа'] * -1 > sorted_operations_by_amount[-1]:
-            sorted_operations_by_amount.append(operation['Сумма платежа'] * -1)
+            if operation['Статус'] == 'OK':
+                sorted_operations_by_amount.append(operation['Сумма платежа'] * -1)
     sort_operations = sorted(sorted_operations_by_amount[1:], reverse=True)[:5]
     for top_amount in sort_operations:
         for operation in list_operations:
@@ -76,12 +79,13 @@ def card_stats(path):
     card_numbers = list(Counter(card))
     cards_statistic = [{"last_digits": '', "total_spent": 0, "cashback": 0} for _ in range(len(card_numbers))]
     for operation in operations:
-         for i in range(0, len(card_numbers)):
-             cards_statistic[i]['last_digits'] = card_numbers[i]
-             if operation['Номер карты'] == card_numbers[i]:
-                 cards_statistic[i]['total_spent'] += operation['Сумма платежа'] * -1
-             if operation['Номер карты'] == card_numbers[i]:
-                 cards_statistic[i]['cashback'] += operation['Сумма платежа'] * -1 / 100
+        if operation['Статус'] == 'OK':
+            for i in range(0, len(card_numbers)):
+                 cards_statistic[i]['last_digits'] = card_numbers[i]
+                 if operation['Номер карты'] == card_numbers[i]:
+                     cards_statistic[i]['total_spent'] += operation['Сумма платежа'] * -1
+                 if operation['Номер карты'] == card_numbers[i]:
+                     cards_statistic[i]['cashback'] += operation['Сумма платежа'] * -1 / 100
     return cards_statistic
 
 
@@ -93,3 +97,37 @@ def stock_prices():
     for key, value in hist.items():
         stock_prices['price'] = value
     return stock_prices
+
+
+def all_cost(path:str):
+    operations = reader_excel(path)
+    all_cost = {"expenses":{"total_amount": 0, "main": [{},{},{},{},{},{},{},{}], "transfer_and_cash":[{},{}]}}
+    cost = 0
+    for operation in operations:
+        if operation['Статус'] == 'OK':
+            if operation['Сумма платежа'] < 0:
+                cost += operation['Сумма платежа'] * -1
+    all_cost["expenses"]["total_amount"] = cost
+
+
+    return all_cost
+
+
+
+
+# print(all_cost('C:/Users/1/PycharmProjects/Coursework1/data/operations.xlsx'))
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

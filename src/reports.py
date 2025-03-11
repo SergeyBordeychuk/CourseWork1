@@ -6,11 +6,12 @@ from src.decorators import file_writer
 
 today = str(datetime.datetime.now().date())
 
-@file_writer('reports.txt')
-def spending_by_category(operations, category: str, date: str = today):
+# @file_writer('reports.txt')
+def spending_by_category(operations: DataFrame, category: str, date: str = today):
+    """Возвращает отчёт трат по категориям"""
+    spending = 0
     date_end = date
     month_end = int(date[5:7]) - 3
-    print(month_end)
     if month_end <= 0:
         date_start = str(int(date[:4])-1) + '-' + str(12 + month_end) + '-' + date[8:]
     else:
@@ -18,9 +19,29 @@ def spending_by_category(operations, category: str, date: str = today):
             date_start = date[:5] + '0' + str(int(date[5:7])- 3) + date[7:]
         else:
             date_start = date[:5] + str(int(date[5:7]) - 3) + date[7:]
-    # operations_dict = operations.to_dict()
-    # return date_start, date_end
-    # for i in range(len(operations_dict['category'])):
-    #     if (operations_dict['category'][i] == category) and ((operations_dict['date'][:4] == date_start[:4]) and (operations_dict['date'][:4] == date_start[:4]))
-    return
-print(spending_by_category('', '', today))
+    operations_dict = operations.to_dict()
+    list_end = date_end.split('-')
+    list_start = date_start.split('-')
+    for i in range(len(operations_dict['Категория'])):
+        if isinstance(operations_dict['Дата платежа'][i], str):
+            list_date = operations_dict['Дата платежа'][i].split('.')
+        else:
+            continue
+        if date_end[:4] == date_start[:4]:
+            if (operations_dict['Статус'][i] == 'OK') and ((operations_dict['Категория'][i] == category)
+                and ((list_date[2] == list_start[0]) and (int(list_start[1])) <= int(list_date[1]) <= int(list_end[1])-1)):
+                spending += operations_dict['Сумма платежа'][i] * -1
+
+            if (operations_dict['Статус'][i] == 'OK') and ((operations_dict['Категория'][i] == category)
+                and ((list_date[2] == list_start[0])) and ((list_date[1] == list_end[1]) and (list_date[0] == list_end[2]))):
+                spending += operations_dict['Сумма платежа'][i] * -1
+        else:
+            if (operations_dict['Статус'][i] == 'OK') and ((operations_dict['Категория'][i] == category) and
+            (((list_date[2] == list_start[0]) and (int(list_date[1]) >= int(list_start[1]))
+            or ((list_date[2] == list_end[0]) and
+                (int(list_date[1]) <= int(list_end[1])-1))))):
+                spending += operations_dict['Сумма платежа'][i] * -1
+            if (operations_dict['Статус'][i] == 'OK') and ((list_date[2] == list_end[0]) and
+                    ((int(list_date[1]) == int(list_end[1])) and (list_date[0] <= list_end[2]))):
+                spending += operations_dict['Сумма платежа'][i] * -1
+    return f'{spending}'

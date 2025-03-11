@@ -10,8 +10,9 @@ def file_writer(file_name:str = 'reports.txt'):
         @wraps(func)
         def wrapper(*args,**kwargs):
             func_res = func(*args, **kwargs)
-            with open(file_name, 'a') as f:
+            with open(file_name, 'a', encoding='utf-8') as f:
                 f.write(f'{date} {func.__name__}\n')
-                f.write(func_res)
+                f.write(f'{func_res}\n')
+                return ''
         return wrapper
     return my_decorator

@@ -2,11 +2,9 @@ import datetime
 
 from pandas import DataFrame
 
-from src.decorators import file_writer
-
 today = str(datetime.datetime.now().date())
 
-# @file_writer('reports.txt')
+
 def spending_by_category(operations: DataFrame, category: str, date: str = today):
     """Возвращает отчёт трат по категориям"""
     spending = 0

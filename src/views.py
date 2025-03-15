@@ -37,20 +37,3 @@ def main_page(path:str, date: str):
     json_string = json.dumps(string)
     return json_string
 
-
-# def events_page(date:str, diaposone:str = f'{start_time}-{end_time}'):
-#     json_string = {"expenses": {
-#             "total_amount": 0,
-#             "main": [],
-#             "transfers_and_cash": []
-#           },
-#           "income": {
-#             "total_amount": 0,
-#             "main": []
-#           },
-#           "currency_rates": [],
-#           "stock_prices": []
-#         }
-#
-#     json_string["currency_rates"] = exchange_rate()
-#     json_string["stock_prices"] = stock_prices()

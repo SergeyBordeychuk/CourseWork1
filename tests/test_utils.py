@@ -3,6 +3,7 @@ import json
 import pytest
 
 from src.utils import greeting_now, reader_excel, exchange_rate, stock_prices, sort_operations_by_amount, card_stats
+from unittest.mock import patch
 
 
 @pytest.mark.parametrize('date, expected_result, length',[
@@ -26,7 +27,10 @@ def test_exchange_rate():
     assert len(exchange_rate('2025-01-01', '2025-01-05')) == len(rate)
 
 
-def test_stock_prices():
+@patch('yfinance.Ticker')
+def test_stock_prices(mock_res):
+    mock_res.return_value.history.return_value.to_dict.return_value = {'Open':{'price_stock': 10}}
+    assert stock_prices() == [{'stock': '^GSPC', 'price': 10}]
     with open("user_settings.json") as f:
         stocks = json.load(f)["user_stocks"]
     assert len(stock_prices()) == len(stocks)

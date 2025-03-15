@@ -70,7 +70,7 @@ def exchange_rate(start_date: str, end_date: str):
         "apikey": API_KEY
     }
 
-    response = requests.request("GET", url, headers=headers, data=payload)
+    response = requests.get( url, headers=headers, data=payload)
     result = response.json()
     with open('user_settings.json') as f:
         currency_settings = json.load(f)["user_currencies"]
@@ -119,40 +119,3 @@ def stock_prices():
                 stock_prices[i]['price'] = value
                 stock_prices[i]['stock'] = to
     return stock_prices
-
-
-
-
-
-# def all_cost(path:str):
-#     operations = reader_excel(path)
-#     all_cost = {"expenses":{"total_amount": 0, "main": [{},{},{},{},{},{},{},{}], "transfer_and_cash":[{},{}]}}
-#     cost = 0
-#     for operation in operations:
-#         if operation['Статус'] == 'OK':
-#             if operation['Сумма платежа'] < 0:
-#                 cost += operation['Сумма платежа'] * -1
-#     all_cost["expenses"]["total_amount"] = cost
-#
-#
-#     return all_cost
-
-
-
-
-# print(all_cost('C:/Users/1/PycharmProjects/Coursework1/data/operations.xlsx'))
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
